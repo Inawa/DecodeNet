@@ -29,7 +29,6 @@ import os
 import models
 
 import matplotlib
-import DP
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -68,36 +67,12 @@ frac = 0.3  # participation of clients; if 1 then 100% clients participate in SF
 lr = 0.01
 
 #####################
-Active_DP = True
-dp_clip = 10
-dp_epsilon = 0.5
-dp_delta = 1e-5
-
-Active_piexDP = True
 
 
+net_glob_client = models.ResNet18_client_side1(models.Baseblock,[2,2,2],1,32).to(device)
 
-#net_glob_client = models.LeNet_client_side(3).to(device)
-#net_glob_client = models.ResNet_client_side().to(device)
-#net_glob_client = models.ResNet18_client_side_32(3).to(device)
-net_glob_client = models.ResNet18_client_side2_pixDP(models.Baseblock,[2,2,2]).to(device)
-# if torch.cuda.device_count() > 1:
-#     print("We use", torch.cuda.device_count(), "GPUs")
-#     net_glob_client = nn.DataParallel(net_glob_client)
+net_glob_server = models.ResNet18_server_side1(models.Baseblock,[2,2,2], 10).to(device)
 
-# net_glob_client.to(device)
-# print(net_glob_client)
-
-
-#net_glob_server = models.LeNet_server_side().to(device) # 7 is my numbr of classes
-#net_glob_server = models.ResNet_server_side(models.BasicBlock,[2,2,2,2],10).to(device)
-net_glob_server = models.ResNet18_server_side2_pixDP(models.Baseblock,[2,2,2], 10).to(device)
-# if torch.cuda.device_count() > 1:
-#     print("We use", torch.cuda.device_count(), "GPUs")
-#     net_glob_server = nn.DataParallel(net_glob_server)  # to use the multiple GPUs
-
-# net_glob_server.to(device)
-# print(net_glob_server)
 
 # ===================================================================================
 # For Server Side Loss and Accuracy
@@ -395,9 +370,6 @@ class Client(object):
                 # --------backward prop -------------
                 fx.backward(dfx)
                 ###################
-                if Active_DP:
-                    DP.clip_gradients(net,dp_clip)
-                    DP.grd_add_noise(lr,dp_clip,dp_epsilon,dp_delta,self.dsize,net,device)
                 ###################
                 optimizer_client.step()
 
@@ -507,11 +479,7 @@ for iter in range(epochs):
     # Update mnist_client-side global model
     net_glob_client.load_state_dict(w_glob_client)
 
-    #if iter == epochs-2 :
-    # if iter%100==0:
-    # torch.save(w_glob_client,"/data0/HHong/mnist_cmd_pixdp_0.05")
-    # torch.save(net_glob_server.state_dict(),"/data0/HHong/mnist_smd_pixdp_0.05")
 
-#    if iter>25:
-#        lr *= 0.1
-    print(lr)
+    torch.save(w_glob_client,"/data0/HHong/mnist_cmd1")
+    torch.save(net_glob_server.state_dict(),"/data0/HHong/mnist_smd1")
+

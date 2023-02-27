@@ -66,13 +66,13 @@ lr = 0.0001
 
            
 
-net_glob_client = models.ResNet18_client_side4(models.Baseblock,[2,2,2]).to(device)
- 
-net_glob_server = models.ResNet18_server_side4(models.Baseblock,[2,2,2], 7) 
+net_glob_client = models.ResNet18_client_side1(models.Baseblock,[2,2,2],3,64).to(device)
+
+net_glob_server = models.ResNet18_server_side1(models.Baseblock,[2,2,2], 7).to(device)
  
 
 
- 
+
 
 #===================================================================================
 # For Server Side Loss and Accuracy 
@@ -507,7 +507,7 @@ for iter in range(epochs):
 
 
 
-    torch.save(w_glob_client,"/data0/HHong/ham_cmd4")
-    torch.save(net_glob_server.state_dict(),"/data0/HHong/ham_smd4")
+    torch.save(w_glob_client,"/data0/HHong/ham_cmd1")
+    torch.save(net_glob_server.state_dict(),"/data0/HHong/ham_smd1")
 
 
